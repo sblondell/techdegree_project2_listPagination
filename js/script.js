@@ -42,7 +42,7 @@ const showPage = (list, page) => {
 
   //Clear the list from the page
   hideList();
-/*
+
   if (page >= numberOfPages){ //Unique Conditional: if the last page is selected, display the last page
     let i = pageFloor;
     while (studentList[i]){
@@ -54,12 +54,13 @@ const showPage = (list, page) => {
       studentList[i].style.display = '';
     }
   }
-*/
+
+  /* more condensed way of displaying pages 
   let i = pageFloor;
-  while (studentList[i] || i < pageCeiling){
+  while (studentList[i] && i < pageCeiling){
     studentList[i].style.display = '';
     i++;
-  }
+  } */
 
 }
 
