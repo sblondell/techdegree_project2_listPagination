@@ -1,11 +1,10 @@
-/******************************************
-Treehouse Techdegree:
-FSJS project 2 - List Filter and Pagination
-******************************************/
+/* techdegree project 2 - List Pagination and Filtering  */
+/* December 12, 2018					 */
+/*                                                       */
+/* Using HTML5, CSS, and Javascript to create a webpage  */
+/* that divides one list into digestible chunks.         */
+/* #Extra Credit */
    
-// Study guide for this project - https://drive.google.com/file/d/1OD1diUsTMdpfMDv677TfL1xO2CEkykSz/view?usp=sharing
-
-
 /*** 
    Add your global variables that store the DOM elements you will 
    need to reference and/or manipulate. 
@@ -16,25 +15,56 @@ FSJS project 2 - List Filter and Pagination
    will only be used inside of a function, then it can be locally 
    scoped to that function.
 ***/
+const studentList = document.querySelector('.student-list').children;
+
+/*const hideList = function(){
+  let i = 0;
+
+  while (studentList[i]){
+    studentList[i].style.display = 'none';
+    i++;
+  }
+}*/
+
+function hideList(){
+  let i = 0;
+
+  while (studentList[i]){
+    studentList[i].style.display = 'none';
+    i++;
+  }
+}
+
+const showPage = (list, page) => {
+  let pageCeiling = page * 10;
+  let pageFloor = pageCeiling - 10;
+  let numberOfPages = Math.ceil(studentList.length / 10);
+
+  //Clear the list from the page
+  hideList();
+/*
+  if (page >= numberOfPages){ //Unique Conditional: if the last page is selected, display the last page
+    let i = pageFloor;
+    while (studentList[i]){
+      studentList[i].style.display = '';
+      i++;
+    }
+  }else{
+    for (let i = pageFloor; i < pageCeiling; i++){
+      studentList[i].style.display = '';
+    }
+  }
+*/
+  let i = pageFloor;
+  while (studentList[i] || i < pageCeiling){
+    studentList[i].style.display = '';
+    i++;
+  }
+
+}
 
 
-
-
-/*** 
-   Create the `showPage` function to hide all of the items in the 
-   list except for the ten you want to show.
-
-   Pro Tips: 
-     - Keep in mind that with a list of 54 students, the last page 
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when 
-       you initially define the function, and it acts as a variable 
-       or a placeholder to represent the actual function `argument` 
-       that will be passed into the parens later when you call or 
-       "invoke" the function 
-***/
-
+//showPage(studentList, 3);
 
 
 
@@ -47,4 +77,3 @@ FSJS project 2 - List Filter and Pagination
 
 
 
-// Remember to delete the comments that came with this file, and replace them with your own code comments.
