@@ -16,6 +16,8 @@
    scoped to that function.
 ***/
 const studentList = document.querySelector('.student-list').children;
+const entriesPerPage = 10;
+const numberOfPages = Math.ceil(studentList.length / entriesPerPage);
 
 /*const hideList = function(){
   let i = 0;
@@ -26,6 +28,19 @@ const studentList = document.querySelector('.student-list').children;
   }
 }*/
 
+const manipulateEl = {
+  create : (element, property, value) => {
+    let tempEl = document.createElement(element);
+
+    tempEl[property] = value;
+    return tempEl;
+  },
+  append : (element, destination) => {
+    destination.appendChild(element);
+    return destination;
+  }
+}
+    
 function hideList(){
   let i = 0;
 
@@ -36,13 +51,13 @@ function hideList(){
 }
 
 const showPage = (list, page) => {
-  let pageCeiling = page * 10;
-  let pageFloor = pageCeiling - 10;
-  let numberOfPages = Math.ceil(studentList.length / 10);
+  let pageCeiling = page * entriesPerPage;
+  let pageFloor = pageCeiling - entriesPerPage;
 
   //Clear the list from the page
   hideList();
 
+  /*
   if (page >= numberOfPages){ //Unique Conditional: if the last page is selected, display the last page
     let i = pageFloor;
     while (studentList[i]){
@@ -54,18 +69,37 @@ const showPage = (list, page) => {
       studentList[i].style.display = '';
     }
   }
+  */
 
-  /* more condensed way of displaying pages 
-  let i = pageFloor;
-  while (studentList[i] && i < pageCeiling){
-    studentList[i].style.display = '';
-    i++;
-  } */
+  //let i = pageFloor;
+  while (studentList[pageFloor] && pageFloor < pageCeiling){ //Conditional that makes sure the loop doesn't access
+    studentList[pageFloor].style.display = '';               //out of bound array && doesn't overshoot number of entries
+    pageFloor++;
+  } 
 
 }
 
+const pagination = () => {
+  const pageDiv = document.querySelector('.page');
+  const div_pagination = manipulateEl.create('div', 'className', 'pagination');
+  const ul_pagination = manipulateEl.create('ul');
 
-//showPage(studentList, 3);
+  manipulateEl.append(ul_pagination, div_pagination);
+  manipulateEl.append(div_pagination, pageDiv);
+
+  for (let i = 1; i <= numberOfPages; i++){
+    let li = manipulateEl.create('li');
+    let a = manipulateEl.create('a', 'href', '#');
+
+    a.textContent = i;
+    manipulateEl.append(manipulateEl.append(a, li), ul_pagination);
+  }
+  document.querySelectorAll('div[class="pagination"] ul li')[0].firstElementChild.className = 'active'; //Turning first button "blue"
+}
+
+pagination();
+showPage(studentList, 1);
+
 
 
 
