@@ -21,7 +21,8 @@ const manipulateEl = {
   }
 }
     
-function hideList(){
+//Sets the css 'display' property to 'none' for all student entries
+function hideList() {
   let i = 0;
 
   while (studentList[i]){
@@ -30,29 +31,32 @@ function hideList(){
   }
 }
 
+//Sets the css 'display' property to show for all appropriate entries
 const showPage = (list, page) => {
   let pageCeiling = page * entriesPerPage;
   let pageFloor = pageCeiling - entriesPerPage;
 
-  //Clear the list from the page
   hideList();
 
   while (studentList[pageFloor] && pageFloor < pageCeiling){ //Conditional that makes sure the loop doesn't access
-    studentList[pageFloor].style.display = '';               //out of bound array && doesn't overshoot number of entries
+    studentList[pageFloor].style.display = '';               //out of bound array && doesn't overshoot number of entries per page
     pageFloor++;
   } 
 
 }
 
+//Dynamically creates navigation links for the student list, then sets a 'click' listener to wait for page navigation
 const appendPageLinks = () => {
   const pageDiv = document.querySelector('.page');
   const div_pagination = manipulateEl.create('div', 'className', 'pagination');
   const ul_pagination = manipulateEl.create('ul');
   let currentPage = 0;
 
+  //Setting up the skeleton for page navigation links
   manipulateEl.append(ul_pagination, div_pagination);
   manipulateEl.append(div_pagination, pageDiv);
 
+  //Adding the appropriate number of page links
   for (let i = 1; i <= numberOfPages; i++){
     let li = manipulateEl.create('li');
     let a = manipulateEl.create('a', 'href', '#');
@@ -65,12 +69,24 @@ const appendPageLinks = () => {
   //Activate a listener for the navigation links
   ul_pagination.addEventListener('click', (e) => {
     showPage(studentList, e.target.textContent);
-    e.target.className = 'active';
-    ul_pagination.children[currentPage].firstElementChild.className = ''; //Turning current navigation link 'colorless'
+    e.target.className = 'active'; //Turning the current page link 'blue'
+    ul_pagination.children[currentPage].firstElementChild.className = ''; //Turning the previous page link "colorless"
     currentPage = (e.target.textContent - 1);
   });
 }
 
+const searchFunction = () => {
+  let pageHeaderDiv = document.querySelector('.page-header.cf');
+  let button = manipulateEl.create('button', 'textContent', 'Search');
+  let input = manipulateEl.create('input', 'placeholder', 'Search for students...');
+  let searchDiv = manipulateEl.create('div', 'className', 'student-search');
+  
+  manipulateEl.append(input, searchDiv);
+  manipulateEl.append(button, searchDiv);
+  manipulateEl.append(searchDiv, pageHeaderDiv);
+}
+
 appendPageLinks();
 showPage(studentList, 1);
+searchFunction();
 
