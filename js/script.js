@@ -4,6 +4,7 @@
 /* Using HTML5, CSS, and Javascript to create a webpage  */
 /* that divides one list into digestible chunks.         */
 
+const pageDiv = document.querySelector('.page');
 const studentList = document.querySelector('.student-list').children;
 const entriesPerPage = 10;
 const numberOfPages = Math.ceil(studentList.length / entriesPerPage);
@@ -47,7 +48,6 @@ const showPage = (list, page) => {
 
 //Dynamically creates navigation links for the student list, then sets a 'click' listener to wait for page navigation
 const appendPageLinks = () => {
-  const pageDiv = document.querySelector('.page');
   const div_pagination = manipulateEl.create('div', 'className', 'pagination');
   const ul_pagination = manipulateEl.create('ul');
   let currentPage = 0;
@@ -76,14 +76,41 @@ const appendPageLinks = () => {
 }
 
 const searchFunction = () => {
-  let pageHeaderDiv = document.querySelector('.page-header.cf');
-  let button = manipulateEl.create('button', 'textContent', 'Search');
-  let input = manipulateEl.create('input', 'placeholder', 'Search for students...');
-  let searchDiv = manipulateEl.create('div', 'className', 'student-search');
+  const pageHeaderDiv = document.querySelector('.page-header.cf');
+  const searchButton = manipulateEl.create('Button', 'textContent', 'Search');
+  const searchInput = manipulateEl.create('Input', 'placeholder', 'Search for students...');
+  const searchDiv = manipulateEl.create('div', 'className', 'student-search');
+  const studentListNames = document.querySelectorAll('div[class=student-details] h3');
+  const studentListEmails = document.querySelectorAll('div[class=student-details] span[class=email]');
+  const studentListParent = document.querySelector('.student-list');
   
-  manipulateEl.append(input, searchDiv);
-  manipulateEl.append(button, searchDiv);
+  manipulateEl.append(searchInput, searchDiv);
+  manipulateEl.append(searchButton, searchDiv);
   manipulateEl.append(searchDiv, pageHeaderDiv);
+  let searchNotFound = manipulateEl.create('p', 'textContent', 'No matches found...');
+  searchNotFound.style.display = 'none';
+  pageDiv.insertBefore(searchNotFound, studentListParent);
+
+  searchButton.addEventListener('click', (e) => {
+    let userSearch = searchInput.value.toLowerCase();
+    let found = false;
+
+    hideList();
+
+    for (let i = 0; i < studentList.length; i++){
+      let studentName = studentListNames[i].textContent.toLowerCase();
+      let studentEmail = studentListEmails[i].textContent.toLowerCase();
+  
+      if (userSearch === studentName || studentEmail.includes(userSearch)){
+	found = true;
+	searchNotFound.style.display = 'none';
+	studentList[i].style.display = '';
+      }
+    }
+    if (!found){
+      searchNotFound.style.display = '';
+    }
+  });
 }
 
 appendPageLinks();
