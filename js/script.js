@@ -22,7 +22,7 @@ const pageDiv = document.querySelector('.page');
 const studentListParent = document.querySelector('.student-list');
 const studentList = studentListParent.children;
 const entriesPerPage = 10;
-const numberOfPages = Math.ceil(studentList.length / entriesPerPage);
+
 
 //Setting up the skeleton for the "No matches found..." scenario...
 const searchNotFound = manipulateEl.create('p', 'textContent', 'No matches found...');
@@ -56,9 +56,10 @@ const showPage = (list, page) => {
 }
 
 //Dynamically creates navigation links for the student list, then sets a 'click' listener to wait for page navigation
-const appendPageLinks = () => {
+const appendPageLinks = (list) => {
   const node_paginationDIV = manipulateEl.create('div', 'className', 'pagination');
   const node_paginationUL = manipulateEl.create('ul');
+  const numberOfPages = Math.ceil(list.length / entriesPerPage);
   let currentPage = 0;
 
   //Setting up the skeleton for page navigation links
@@ -77,7 +78,7 @@ const appendPageLinks = () => {
   
   //Activate a listener for the navigation links
   node_paginationUL.addEventListener('click', (e) => {
-    showPage(studentList, e.target.textContent);
+    showPage(list, e.target.textContent);
     if (e.target.className != 'active'){
       e.target.className = 'active'; //Turning the current page link 'blue'
       node_paginationUL.children[currentPage].firstElementChild.className = ''; //Turning the previous page link "colorless"
@@ -90,11 +91,11 @@ const appendSearchResultsLinks = () => {
 }
 
 const searchFunction = () => {
-  const pageHeaderDiv = document.querySelector('.page-header.cf');
   const studentListNames = document.querySelectorAll('div[class=student-details] h3');
   const studentListEmails = document.querySelectorAll('div[class=student-details] span[class=email]');
 
   //Setting up the skeleton for the search functionality...
+  const pageHeaderDiv = document.querySelector('.page-header.cf');
   const searchButton = manipulateEl.create('Button', 'textContent', 'Search');
   const searchInput = manipulateEl.create('Input', 'placeholder', 'Search for students...');
   const searchDiv = manipulateEl.create('div', 'className', 'student-search');
@@ -107,14 +108,12 @@ const searchFunction = () => {
     const searchResultsList = new Array(studentList.length);
     let currentOpenIndex = 0;
     let found = false;
-    let studentName = '';
-    let studentEmail = '';
 
     hideList(studentList);
 
     for (let i = 0; i < studentList.length; i++){
-      studentName = studentListNames[i].textContent.toLowerCase();
-      studentEmail = studentListEmails[i].textContent.toLowerCase();
+      let studentName = studentListNames[i].textContent.toLowerCase();
+      let studentEmail = studentListEmails[i].textContent.toLowerCase();
   
       if (studentName.includes(userSearch) || studentEmail.includes(userSearch)){
 	found = true;
@@ -136,14 +135,12 @@ const searchFunction = () => {
     const searchResultsList = new Array(studentList.length);
     let currentOpenIndex = 0;
     let found = false;
-    let studentName = '';
-    let studentEmail = '';
 
     hideList(studentList);
 
     for (let i = 0; i < studentList.length; i++){
-      studentName = studentListNames[i].textContent.toLowerCase();
-      studentEmail = studentListEmails[i].textContent.toLowerCase();
+      let studentName = studentListNames[i].textContent.toLowerCase();
+      let studentEmail = studentListEmails[i].textContent.toLowerCase();
   
      // if (userSearch[userSearch.length-1] === studentName[userSearch.length-1]){
       if (studentName.includes(userSearch)){
@@ -162,7 +159,7 @@ const searchFunction = () => {
   });
 }
 
-appendPageLinks();
 showPage(studentList, 1);
+appendPageLinks(studentList);
 searchFunction();
 
