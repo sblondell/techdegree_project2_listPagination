@@ -23,7 +23,6 @@ const studentListParent = document.querySelector('.student-list');
 const studentList = studentListParent.children;
 const entriesPerPage = 10;
 
-
 //Setting up the skeleton for the "No matches found..." scenario...
 const searchNotFound = manipulateEl.create('p', 'textContent', 'No matches found...');
 searchNotFound.style.display = 'none';
@@ -46,7 +45,6 @@ const showPage = (list, page) => {
   let pageFloor = pageCeiling - entriesPerPage;
 
   hideList(studentList);
-  searchNotFound.style.display = 'none';
 
   while (list[pageFloor] && pageFloor < pageCeiling){ //Conditional that makes sure the loop doesn't access
     list[pageFloor].style.display = '';               //out of bound array && doesn't overshoot number of entries per page
@@ -57,37 +55,41 @@ const showPage = (list, page) => {
 
 //Dynamically creates navigation links for the student list, then sets a 'click' listener to wait for page navigation
 const appendPageLinks = (list) => {
-  const node_paginationDIV = manipulateEl.create('div', 'className', 'pagination');
-  const node_paginationUL = manipulateEl.create('ul');
-  const numberOfPages = Math.ceil(list.length / entriesPerPage);
-  let currentPage = 0;
-
-  //Setting up the skeleton for page navigation links
-  manipulateEl.append(node_paginationUL, node_paginationDIV);
-  manipulateEl.append(node_paginationDIV, pageDiv);
-
-  //Adding the appropriate number of page links
-  for (let i = 1; i <= numberOfPages; i++){
-    let li = manipulateEl.create('li');
-    let a = manipulateEl.create('a', 'href', '#');
-
-    a.textContent = i;
-    manipulateEl.append(manipulateEl.append(a, li), node_paginationUL);
+  if (document.querySelector('div[class=pagination]')){ //If pagination links are already setup, remove them
+    pageDiv.removeChild(document.querySelector('div[class=pagination]'));
   }
-  node_paginationUL.children[0].firstElementChild.className = 'active'; //Turning first navigation link 'blue'
+  if (!list.length > 0){ //If the list has no entries, exit the function
+    return console.log("Your list is empty!!!");
+  }else{
+    const numberOfPages = Math.ceil(list.length / entriesPerPage);
+    let currentPage = 0;
   
-  //Activate a listener for the navigation links
-  node_paginationUL.addEventListener('click', (e) => {
-    showPage(list, e.target.textContent);
-    if (e.target.className != 'active'){
-      e.target.className = 'active'; //Turning the current page link 'blue'
-      node_paginationUL.children[currentPage].firstElementChild.className = ''; //Turning the previous page link "colorless"
-      currentPage = (e.target.textContent - 1);
+    //Setting up the skeleton for page navigation links
+    const node_paginationDIV = manipulateEl.create('div', 'className', 'pagination');
+    const node_paginationUL = manipulateEl.create('ul');
+    manipulateEl.append(node_paginationUL, node_paginationDIV);
+    manipulateEl.append(node_paginationDIV, pageDiv);
+    
+    //Adding the appropriate number of page links
+    for (let i = 1; i <= numberOfPages; i++){
+      let li = manipulateEl.create('li');
+      let a = manipulateEl.create('a', 'href', '#');
+  
+      a.textContent = i;
+      manipulateEl.append(manipulateEl.append(a, li), node_paginationUL);
     }
-  });
-}
-
-const appendSearchResultsLinks = () => {
+    node_paginationUL.children[0].firstElementChild.className = 'active'; //Turning first navigation link 'blue'
+    
+    //Activate a listener for the navigation links
+    node_paginationUL.addEventListener('click', (e) => {
+      showPage(list, e.target.textContent);
+      if (e.target.className != 'active'){
+        e.target.className = 'active'; //Turning the current page link 'blue'
+        node_paginationUL.children[currentPage].firstElementChild.className = ''; //Turning the previous page link "colorless"
+        currentPage = (e.target.textContent - 1);
+      }
+    });
+  }
 }
 
 const searchFunction = () => {
@@ -103,59 +105,32 @@ const searchFunction = () => {
   manipulateEl.append(searchButton, searchDiv);
   manipulateEl.append(searchDiv, pageHeaderDiv);
 
-  searchButton.addEventListener('click', (e) => {
-    const userSearch = searchInput.value.toLowerCase();
-    const searchResultsList = new Array(studentList.length);
-    let currentOpenIndex = 0;
+  const crawler = (userSearch) => {
+    const searchResultsList = new Array();
     let found = false;
-
-    hideList(studentList);
 
     for (let i = 0; i < studentList.length; i++){
       let studentName = studentListNames[i].textContent.toLowerCase();
-      let studentEmail = studentListEmails[i].textContent.toLowerCase();
+      //Using "stripped" string from the student list; stripped the email server out
+      let studentEmail = studentListEmails[i].textContent.replace('@example.com', '').toLowerCase();
   
       if (studentName.includes(userSearch) || studentEmail.includes(userSearch)){
 	found = true;
 	searchNotFound.style.display = 'none';
-	searchResultsList[currentOpenIndex] = studentList[i];
-	currentOpenIndex++;
+	searchResultsList.push(studentList[i]);
       }
     }
-    if (!found){
-      searchNotFound.style.display = '';
-    }else{
-      showPage(searchResultsList, 1);
-      appendSearchResultsLinks(); 
-    }
+    if (!found) searchNotFound.style.display = '';
+    showPage(searchResultsList, 1);
+    appendPageLinks(searchResultsList);
+  }
+    
+  searchButton.addEventListener('click', (e) => {
+    crawler(searchInput.value.toLowerCase());
   });
   
   searchInput.addEventListener('keyup', (e) => {
-    const userSearch = searchInput.value.toLowerCase();
-    const searchResultsList = new Array(studentList.length);
-    let currentOpenIndex = 0;
-    let found = false;
-
-    hideList(studentList);
-
-    for (let i = 0; i < studentList.length; i++){
-      let studentName = studentListNames[i].textContent.toLowerCase();
-      let studentEmail = studentListEmails[i].textContent.toLowerCase();
-  
-     // if (userSearch[userSearch.length-1] === studentName[userSearch.length-1]){
-      if (studentName.includes(userSearch)){
-	found = true;
-	searchNotFound.style.display = 'none';
-	searchResultsList[currentOpenIndex] = studentList[i];
-	currentOpenIndex++;
-      }
-    }
-    if (!found){
-      searchNotFound.style.display = '';
-    }else{
-      showPage(searchResultsList, 1);
-      appendSearchResultsLinks(); 
-    }
+    crawler(searchInput.value.toLowerCase());
   });
 }
 
