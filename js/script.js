@@ -4,7 +4,7 @@
 /* Using HTML5, CSS, and Javascript to create a webpage  */
 /* that divides one list into digestible chunks.         */
 
-//Operators for manipulating HTML nodes
+//Object for manipulating HTML nodes
 const manipulateEl = {
   create : (element, property, value) => {
     let tempEl = document.createElement(element);
@@ -53,7 +53,7 @@ const showPage = (list, page) => {
 
 }
 
-//Dynamically creates navigation links for the student list, then sets a 'click' listener to wait for page navigation
+//Dynamically creates navigation links for the parameter, list, then sets a 'click' listener to wait for page navigation
 const appendPageLinks = (list) => {
   if (document.querySelector('div[class=pagination]')){ //If pagination links are already setup, remove them
     pageDiv.removeChild(document.querySelector('div[class=pagination]'));
@@ -111,7 +111,8 @@ const searchFunction = () => {
 
     for (let i = 0; i < studentList.length; i++){
       let studentName = studentListNames[i].textContent.toLowerCase();
-      //Using "stripped" string from the student list; stripped the email server out
+      //Using "stripped" string from the student list; stripped the email server out; this prevents any variation
+      //of '@example.com' from returning a postive hit
       let studentEmail = studentListEmails[i].textContent.replace('@example.com', '').toLowerCase();
   
       if (studentName.includes(userSearch) || studentEmail.includes(userSearch)){
