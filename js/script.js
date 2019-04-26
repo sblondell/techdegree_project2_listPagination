@@ -1,11 +1,11 @@
 /* techdegree project 2 - List Pagination and Filtering  */
-/* December 12, 2018					 */
+/* December 12, 2018					                           */
 /*                                                       */
 /* Using HTML5, CSS, and Javascript to create a webpage  */
 /* that divides one list into digestible chunks.         */
 
 //Object for manipulating HTML nodes
-const manipulateEl = {
+const DOM_elements_tools = {
   create : (element, property, value) => {
     let tempEl = document.createElement(element);
 
@@ -23,8 +23,8 @@ const studentListParent = document.querySelector('.student-list');
 const studentList = studentListParent.children;
 const entriesPerPage = 10;
 
-//Setting up the skeleton for the "No matches found..." scenario...
-const searchNotFound = manipulateEl.create('p', 'textContent', 'No matches found...');
+//Setting up the "No matches found..." tooltip...
+const searchNotFound = DOM_elements_tools.create('p', 'textContent', 'No matches found...');
 searchNotFound.style.display = 'none';
 pageDiv.insertBefore(searchNotFound, studentListParent);
 
@@ -53,11 +53,11 @@ const showPage = (list, page) => {
 
 }
 
-//Dynamically creates navigation links for the parameter, list, then sets a 'click' listener to wait for page navigation
-const appendPageLinks = (list) => {
-  if (document.querySelector('div[class=pagination]')){ //If pagination links are already setup, remove them
+//Dynamically creates navigation links for the parameter(list) then sets a 'click' listener to wait for page navigation
+const appendPageLinks = list => {
+  if (document.querySelector('div[class=pagination]')) //If pagination links are already setup, remove them
     pageDiv.removeChild(document.querySelector('div[class=pagination]'));
-  }
+  
   if (!list.length > 0){ //If the list has no entries, exit the function
     return console.log("Your list is empty!!!");
   }else{
@@ -65,24 +65,25 @@ const appendPageLinks = (list) => {
     let currentPage = 0;
   
     //Setting up the skeleton for page navigation links
-    const node_paginationDIV = manipulateEl.create('div', 'className', 'pagination');
-    const node_paginationUL = manipulateEl.create('ul');
-    manipulateEl.append(node_paginationUL, node_paginationDIV);
-    manipulateEl.append(node_paginationDIV, pageDiv);
+    const node_paginationDIV = DOM_elements_tools.create('div', 'className', 'pagination');
+    const node_paginationUL = DOM_elements_tools.create('ul');
+    DOM_elements_tools.append(node_paginationUL, node_paginationDIV);
+    DOM_elements_tools.append(node_paginationDIV, pageDiv);
     
     //Adding the appropriate number of page links
     for (let i = 1; i <= numberOfPages; i++){
-      let li = manipulateEl.create('li');
-      let a = manipulateEl.create('a', 'href', '#');
+      let li = DOM_elements_tools.create('li');
+      let a = DOM_elements_tools.create('a', 'href', '#');
   
       a.textContent = i;
-      manipulateEl.append(manipulateEl.append(a, li), node_paginationUL);
+      DOM_elements_tools.append(DOM_elements_tools.append(a, li), node_paginationUL);
     }
     node_paginationUL.children[0].firstElementChild.className = 'active'; //Turning first navigation link 'blue'
     
     //Activate a listener for the navigation links
     node_paginationUL.addEventListener('click', (e) => {
       showPage(list, e.target.textContent);
+
       if (e.target.className != 'active'){
         e.target.className = 'active'; //Turning the current page link 'blue'
         node_paginationUL.children[currentPage].firstElementChild.className = ''; //Turning the previous page link "colorless"
@@ -94,44 +95,41 @@ const appendPageLinks = (list) => {
 
 const searchFunction = () => {
   const studentListNames = document.querySelectorAll('div[class=student-details] h3');
-  const studentListEmails = document.querySelectorAll('div[class=student-details] span[class=email]');
 
   //Setting up the skeleton for the search functionality...
   const pageHeaderDiv = document.querySelector('.page-header.cf');
-  const searchButton = manipulateEl.create('Button', 'textContent', 'Search');
-  const searchInput = manipulateEl.create('Input', 'placeholder', 'Search for students...');
-  const searchDiv = manipulateEl.create('div', 'className', 'student-search');
-  manipulateEl.append(searchInput, searchDiv);
-  manipulateEl.append(searchButton, searchDiv);
-  manipulateEl.append(searchDiv, pageHeaderDiv);
+  const searchButton = DOM_elements_tools.create('Button', 'textContent', 'Search');
+  const searchInput = DOM_elements_tools.create('Input', 'placeholder', 'Search for students...');
+  const searchDiv = DOM_elements_tools.create('div', 'className', 'student-search');
+  DOM_elements_tools.append(searchInput, searchDiv);
+  DOM_elements_tools.append(searchButton, searchDiv);
+  DOM_elements_tools.append(searchDiv, pageHeaderDiv);
 
-  const crawler = (userSearch) => {
+  const list_searcher = userSearch => {
     const searchResultsList = new Array();
     let found = false;
 
     for (let i = 0; i < studentList.length; i++){
       let studentName = studentListNames[i].textContent.toLowerCase();
-      //Using "stripped" string from the student list; stripped the email server out; this prevents any variation
-      //of '@example.com' from returning a postive hit
-      let studentEmail = studentListEmails[i].textContent.replace('@example.com', '').toLowerCase();
   
-      if (studentName.includes(userSearch) || studentEmail.includes(userSearch)){
-	found = true;
-	searchNotFound.style.display = 'none';
-	searchResultsList.push(studentList[i]);
+      if (studentName.includes(userSearch)){ 
+        found = true;
+        searchNotFound.style.display = 'none';
+        searchResultsList.push(studentList[i]);
       }
     }
     if (!found) searchNotFound.style.display = '';
+
     showPage(searchResultsList, 1);
     appendPageLinks(searchResultsList);
   }
     
-  searchButton.addEventListener('click', (e) => {
-    crawler(searchInput.value.toLowerCase());
+  searchButton.addEventListener('click', e => {
+    list_searcher(searchInput.value.toLowerCase());
   });
   
-  searchInput.addEventListener('keyup', (e) => {
-    crawler(searchInput.value.toLowerCase());
+  searchInput.addEventListener('keyup', e => {
+    list_searcher(searchInput.value.toLowerCase());
   });
 }
 
